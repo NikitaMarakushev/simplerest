@@ -23,38 +23,54 @@ func New(config *Config) *APIServer {
 	}
 }
 
-func (s *APIServer) Start() error {
+func (server *APIServer) Start() error {
 
-	if error := s.configureLogger(); error != nil {
-		return error
+	if err := server.configureLogger(); err != nil {
+		return err
 	}
 
-	s.configureRouter()
+	server.configureRouter()
 
-	s.logger.Info("API server started successfully!")
+	if err := server.configureStore(); err != nil {
+		return err
+	}
 
-	return http.ListenAndServe(s.config.BindAddr, s.router)
+	server.logger.Info("API server started successfully!")
+
+	return http.ListenAndServe(server.config.BindAddr, server.router)
 }
 
-func (s *APIServer) configureLogger() error {
-	level, error := logrus.ParseLevel(s.config.LogLevel)
+func (server *APIServer) configureLogger() error {
+	level, err := logrus.ParseLevel(server.config.LogLevel)
 
-	if error != nil {
-		return error
+	if err != nil {
+		return err
 	}
 
-	s.logger.SetLevel(level)
+	server.logger.SetLevel(level)
 
 	return nil
 }
 
-func (s *APIServer) configureRouter() {
-	s.router.HandleFunc("/hello", s.handleHello())
+func (server *APIServer) configureRouter() {
+	server.router.HandleFunc("/hello", server.handleHello())
 }
 
-func (s *APIServer) handleHello() http.HandlerFunc {
+func (server *APIServer) handleHello() http.HandlerFunc {
 
-	return func(w http.ResponseWriter, r *http.Request) {
-		io.WriteString(w, "hello")
+	return func(writer http.ResponseWriter, request *http.Request) {
+		io.WriteString(writer, "hello")
 	}
+}
+
+func (server *APIServer) configureStore() error {
+	storeInstance := store.New(server.config.Store)
+
+	if err := storeInstance.Open(); err != nil {
+		return err
+	}
+
+	server.store = storeInstance
+
+	return nil
 }
