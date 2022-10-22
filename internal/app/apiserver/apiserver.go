@@ -5,12 +5,14 @@ import (
 	"github.com/sirupsen/logrus"
 	"io"
 	"net/http"
+	"simplerest/internal/app/store"
 )
 
 type APIServer struct {
 	config *Config
 	logger *logrus.Logger
 	router *mux.Router
+	store  *store.Store
 }
 
 func New(config *Config) *APIServer {
