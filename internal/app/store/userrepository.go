@@ -21,5 +21,17 @@ func (repository *UserRepository) Create(user *model.User) (*model.User, error) 
 }
 
 func (repository *UserRepository) FindByEmail(email string) (*model.User, error) {
-	return nil, nil
+	u := &model.User{}
+	if err := repository.store.database.QueryRow(
+		"SELECT id, email, encrypted_password FROM users WHERE email = $1",
+		email,
+	).Scan(
+		&u.ID,
+		&u.Email,
+		&u.EncryptedPassword,
+	); err != nil {
+		return nil, err
+	}
+
+	return u, nil
 }
