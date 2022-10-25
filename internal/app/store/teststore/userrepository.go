@@ -1,8 +1,8 @@
 package teststore
 
 import (
-	"errors"
 	"simplerest/internal/app/model"
+	"simplerest/internal/app/store/erro"
 )
 
 type UserRepository struct {
@@ -10,7 +10,7 @@ type UserRepository struct {
 	users map[string]*model.User
 }
 
-func (r *UserRepository) Create(u *model.User) error {
+func (r *UserRepository) Create(u *model.User) erros {
 	if err := u.Validate(); err != nil {
 		return err
 	}
@@ -25,11 +25,11 @@ func (r *UserRepository) Create(u *model.User) error {
 	return nil
 }
 
-func (r *UserRepository) FindByEmail(email string) (*model.User, error) {
+func (r *UserRepository) FindByEmail(email string) (*model.User, erros) {
 	u, ok := r.users[email]
 
 	if !ok {
-		return nil, errors.New("not found")
+		return nil, erros.
 	}
 
 	return u, nil

@@ -9,9 +9,6 @@ type Store struct {
 	userRepository *UserRepository
 }
 
-func New() *Store {
-}
-
 func (store *Store) User() store.UserRepository {
 	if store.userRepository != nil {
 		return store.userRepository
