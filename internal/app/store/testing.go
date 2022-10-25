@@ -6,20 +6,20 @@ import (
 	"testing"
 )
 
-func TestStore(testing *testing.T, databaseURL string) (*Store, func(...string)) {
-	testing.Helper()
+func TestStore(t *testing.T, databaseURL string) (*Store, func(...string)) {
+	t.Helper()
 
 	config := NewConfig()
 	config.DatabaseURL = databaseURL
 	store := New(config)
 	if err := store.Open(); err != nil {
-		testing.Fatal()
+		t.Fatal()
 	}
 
 	return store, func(tables ...string) {
 		if len(tables) > 0 {
 			if _, err := store.database.Exec(fmt.Sprintf("TRUNCATE %s CASCADE", strings.Join(tables, ", "))); err != nil {
-				testing.Fatal(err)
+				t.Fatal(err)
 			}
 		}
 
