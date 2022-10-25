@@ -72,19 +72,19 @@ func TestUser_Validate(t *testing.T) {
 		},
 	}
 
-	for _, testCase := range testCases {
-		t.Run(testCase.name, func(t *testing.T) {
-			if testCase.isValid {
-				assert.NoError(t, testCase.user().Validate())
+	for _, tc := range testCases {
+		t.Run(tc.name, func(t *testing.T) {
+			if tc.isValid {
+				assert.NoError(t, tc.user().Validate())
 			} else {
-				assert.Error(t, testCase.user().Validate())
+				assert.Error(t, tc.user().Validate())
 			}
 		})
 	}
 }
 
 func TestUser_BeforeCreate(t *testing.T) {
-	user := model.TestUser(t)
-	assert.NoError(t, user.BeforeCreate())
-	assert.NotEmpty(t, user.EncryptedPassword)
+	u := model.TestUser(t)
+	assert.NoError(t, u.BeforeCreate())
+	assert.NotEmpty(t, u.EncryptedPassword)
 }

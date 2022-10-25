@@ -1,6 +1,8 @@
 package apiserver
 
 import (
+	"bytes"
+	"encoding/json"
 	"github.com/stretchr/testify/assert"
 	"net/http"
 	"net/http/httptest"
@@ -9,9 +11,30 @@ import (
 )
 
 func TestServer_ServerHTTPS(t *testing.T) {
-	rec := httptest.NewRecorder()
-	req, _ := http.NewRequest(http.MethodPost, "/users", nil)
 	s := newServer(teststore.New())
-	s.ServerHTTP(rec, req)
-	assert.NotEqual(t, rec.Code, http.StatusOK)
+	testCases := []struct {
+		name        string
+		payload     interface{}
+		exectedCode int
+	}{
+		{
+			name: "valid",
+			payload: map[string]string{
+				"email":    "user@example.org",
+				"password": "password",
+			},
+			exectedCode: http.StatusCreated,
+		},
+	}
+
+	for _, tc := range testCases {
+		t.Run(tc.name, func(t *testing.T) {
+			rec := httptest.NewRecorder()
+			b := &bytes.Buffer{}
+			json.NewEncoder(b).Encode(tc.payload)
+			req, _ := http.NewRequest(http.MethodPost, "/users", b)
+			s.ServerHTTP(rec, req)
+			assert.Equal(t, tc.exectedCode, rec.Code)
+		})
+	}
 }
