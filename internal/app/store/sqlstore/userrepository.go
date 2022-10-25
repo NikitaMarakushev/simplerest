@@ -1,7 +1,9 @@
 package sqlstore
 
 import (
+	"database/sql"
 	"simplerest/internal/app/model"
+	"simplerest/internal/app/store/errors"
 )
 
 type UserRepository struct {
@@ -34,6 +36,10 @@ func (repository *UserRepository) FindByEmail(email string) (*model.User, error)
 		&u.Email,
 		&u.EncryptedPassword,
 	); err != nil {
+		if err == sql.ErrNoRows {
+			return nil, errors.ErrorRecordNotFound
+		}
+
 		return nil, err
 	}
 

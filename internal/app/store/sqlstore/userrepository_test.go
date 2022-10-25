@@ -3,6 +3,7 @@ package sqlstore_test
 import (
 	"github.com/stretchr/testify/assert"
 	"simplerest/internal/app/model"
+	"simplerest/internal/app/store/errors"
 	"simplerest/internal/app/store/sqlstore"
 	"testing"
 )
@@ -24,7 +25,7 @@ func TestUserRepository_FindByEmail(t *testing.T) {
 	s := sqlstore.New(db)
 	email := "user@example.org"
 	_, err := s.User().FindByEmail(email)
-	assert.Error(t, err)
+	assert.EqualError(t, err, errors.ErrorRecordNotFound.Error())
 
 	u := model.TestUser(t)
 	u.Email = email
