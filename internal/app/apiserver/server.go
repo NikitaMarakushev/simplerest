@@ -21,6 +21,8 @@ func newServer(store store.Store) *server {
 	}
 
 	s.configureRouter()
+
+	return s
 }
 
 func (s *server) ServerHTTP(w http.ResponseWriter, r *http.Request) {
@@ -28,5 +30,11 @@ func (s *server) ServerHTTP(w http.ResponseWriter, r *http.Request) {
 }
 
 func (s *server) configureRouter() {
-	//
+	s.router.HandleFunc("/users", s.handleUsersCreate()).Methods("POST")
+}
+
+func (s *server) handleUsersCreate() http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+
+	}
 }
