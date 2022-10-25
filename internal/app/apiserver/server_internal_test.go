@@ -3,6 +3,7 @@ package apiserver
 import (
 	"bytes"
 	"encoding/json"
+	"github.com/gorilla/sessions"
 	"github.com/stretchr/testify/assert"
 	"net/http"
 	"net/http/httptest"
@@ -12,7 +13,7 @@ import (
 )
 
 func TestServer_ServerHTTPS(t *testing.T) {
-	s := newServer(teststore.New())
+	s := newServer(teststore.New(), sessions.NewCookieStore([]byte(sessionName)))
 	testCases := []struct {
 		name         string
 		payload      interface{}
@@ -56,7 +57,7 @@ func TestServer_ServerHTTP(t *testing.T) {
 	u := model.TestUser(t)
 	store := teststore.New()
 	store.User().Create(u)
-	s := newServer(teststore.New())
+	s := newServer(store, sessions.NewCookieStore([]byte(sessionName)))
 	testCases := []struct {
 		name         string
 		payload      interface{}
@@ -69,6 +70,27 @@ func TestServer_ServerHTTP(t *testing.T) {
 				"password": u.Password,
 			},
 			expectedCode: http.StatusOK,
+		},
+		{
+			name:         "invalid payload",
+			payload:      "",
+			expectedCode: http.StatusBadRequest,
+		},
+		{
+			name: "invalid email",
+			payload: map[string]string{
+				"email":    "invalid email",
+				"password": u.Password,
+			},
+			expectedCode: http.StatusBadRequest,
+		},
+		{
+			name: "invalid password",
+			payload: map[string]string{
+				"email":    u.Email,
+				"password": "invalid password",
+			},
+			expectedCode: http.StatusBadRequest,
 		},
 	}
 
