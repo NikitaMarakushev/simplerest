@@ -1,21 +1,14 @@
-package sqlstore
+package teststore
 
 import (
-	"database/sql"
 	"simplerest/internal/app/store"
-
-	_ "github.com/lib/pq"
 )
 
 type Store struct {
-	database       *sql.DB
 	userRepository *UserRepository
 }
 
-func New(database *sql.DB) *Store {
-	return &Store{
-		database: database,
-	}
+func New() *Store {
 }
 
 func (store *Store) User() store.UserRepository {

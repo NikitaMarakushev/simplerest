@@ -8,24 +8,20 @@ type UserRepository struct {
 	store *Store
 }
 
-func (repository *UserRepository) Create(user *model.User) (*model.User, error) {
+func (repository *UserRepository) Create(user *model.User) error {
 	if err := user.Validate(); err != nil {
-		return nil, err
+		return err
 	}
 
 	if err := user.BeforeCreate(); err != nil {
-		return nil, err
+		return err
 	}
 
-	if err := repository.store.database.QueryRow(
+	return repository.store.database.QueryRow(
 		"INSERT INTO users (email, enctypted_password) VALUES ($1, $2) RETURNING id",
 		user.Email,
 		user.EncryptedPassword,
-	).Scan(&user.ID); err != nil {
-		return nil, err
-	}
-
-	return user, nil
+	).Scan(&user.ID)
 }
 
 func (repository *UserRepository) FindByEmail(email string) (*model.User, error) {
