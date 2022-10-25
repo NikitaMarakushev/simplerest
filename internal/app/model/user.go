@@ -7,32 +7,36 @@ import (
 )
 
 type User struct {
-	ID                int
-	Email             string
-	Password          string
-	EncryptedPassword string
+	ID                int    `json:"id"`
+	Email             string `json:"email"`
+	Password          string `json:"password,omitempty"`
+	EncryptedPassword string `json:"-"`
 }
 
-func (user *User) Validate() error {
+func (u *User) Validate() error {
 	return validation.ValidateStruct(
-		user,
-		validation.Field(&user.Email, validation.Required, is.Email),
-		validation.Field(&user.Password, validation.By(requiredIf(user.EncryptedPassword == "")), validation.Length(8, 40)),
+		u,
+		validation.Field(&u.Email, validation.Required, is.Email),
+		validation.Field(&u.Password, validation.By(requiredIf(u.EncryptedPassword == "")), validation.Length(8, 40)),
 	)
 }
 
-func (user *User) BeforeCreate() error {
+func (u *User) BeforeCreate() error {
 
-	if len(user.Password) > 0 {
-		enc, err := encryptString(user.Password)
+	if len(u.Password) > 0 {
+		enc, err := encryptString(u.Password)
 		if err != nil {
 			return err
 		}
 
-		user.EncryptedPassword = enc
+		u.EncryptedPassword = enc
 	}
 
 	return nil
+}
+
+func (u *User) Sanitize() {
+	u.Password = ""
 }
 
 func encryptString(s string) (string, error) {
